@@ -1,0 +1,84 @@
+Réaliser un programme permettant de gérer automatiquement le
+stock de livres d’une bibliothèque universitaire. Le programme devra
+se baser sur une liste de livres et d’utilisateurs et gérer les emprunts et
+les rendus de livre.
+➢ L’application ne devra pas uniquement indiquer si un livre a été
+emprunter et par qui, mais également gérer les règles de la
+bibliothèque comme les durées d’emprunts, le nombre de livres qu’il
+est possible d’emprunter etc.
+➢ Il y aura plusieurs types d’utilisateur : les étudiants et les professeurs
+qui n’auront pas les mêmes droits en matière d’emprunts.
+➢ Ce projet implique une bonne gestion des fichiers, des structures et
+des chaînes de caractères.
+
+
+
+
+
+--------------------------------------
+
+
+
+Le but principal du projet est de fournir une application fonctionnelle
+pour l’utilisateur. Le programme doit correspondre à la description en
+début de document et implémenter toutes les fonctionnalités listées.
+➢ Votre code sera généreusement commenté.
+➢ Tous les éléments de votre code (variables, fonctions, commentaires)
+seront écrits dans la même langue. Langue anglaise conseillée mais
+pas obligatoire.
+➢ Votre application ne doit jamais s’interrompre de manière
+intempestive (crash), ou tourner en boucle indéfiniment, quelle que
+soit la raison. Toutes les erreurs doivent être gérées correctement. Il
+est préférable d’avoir une application stable avec moins de
+fonctionnalités plutôt qu’une application contenant toutes les
+exigences du cahier des charges mais qui plante trop souvent. Une
+application qui se stoppe de manière imprévue à cause d’une erreur
+de segmentation ou d’une exception, par exemple, sera un
+événement très pénalisant.
+➢ Votre application devra être modulée afin de ne pas avoir l’ensemble
+du code dans un seul et même fichier par exemple. Apportez du soin
+à la conception de votre projet avant de vous lancer dans le code.
+➢ Le livrable fourni à votre chargé(e) de TD sera simplement l’URL de
+votre dépôt Git accessible publiquement. Même si vous n’avez pas
+utilisé ce dépôt régulièrement au cours du projet, le code final sera
+livré dessus.
+
+
+
+
+-----------------------------------------
+
+
+
+
+➢ Généralités
+Votre programme doit pouvoir gérer au moins deux fichiers : un
+contenant la liste des livres et leurs informations, et un autre avec les
+utilisateurs de la bibliothèque.
+Les utilisateurs possèdent un login, un mot de passe personnel, ainsi
+qu’un rôle (étudiant ou professeur).
+Les livres possèdent un titre, un auteur, un numéro d’identification
+ainsi qu’une catégorie à laquelle ils appartiennent.
+Un professeur peut également rajouter un livre supplémentaire au
+stock de livres de la bibliothèque.
+➢ Règles de la bibliothèque
+Un étudiant peut emprunter jusqu’à 3 livres qu’il peut garder chacun
+2 minutes.
+Un professeur peut emprunter maximum 5 livres qu’il peut garder
+plus longtemps que les étudiants (3 minutes).
+En cas de retard sur un rendu, l’utilisateur ne peut pas emprunter de
+nouveau livre tant qu’il n’a pas rendu TOUS les livres en retard.
+➢ Interface
+Lors de l’exécution de l’application, l’utilisateur doit tout d’abord faire
+le choix entre se connecter (il doit alors rentrer son login + mot de
+passe) ou bien créer un nouveau compte.
+Une fois connecté, un message indiquera à l’utilisateur la liste des
+livres déjà empruntés ainsi que l’heure maximale de rendu de ces
+livres. Il aura alors le choix entre rendre un livre ou en emprunter un
+autre (dans le cadre des règles mentionnées ci-dessus).
+Dans le cas où l’utilisateur souhaite emprunter un livre, il pourra faire
+une recherche et afficher les livres disponibles en les affichant par
+ordre alphabétique selon leur titre ou leur auteur. Il pourra également
+faire une recherche par catégorie.
+Il est bien sur impossible d’emprunter un livre déjà emprunté par
+quelqu’un d’autre.
