@@ -82,3 +82,12 @@ ordre alphabétique selon leur titre ou leur auteur. Il pourra également
 faire une recherche par catégorie.
 Il est bien sur impossible d’emprunter un livre déjà emprunté par
 quelqu’un d’autre.
+
+----------------------------------------------------
+
+
+
+
+
+>> Cas où login déjà existant dans les fichier des users
+>>limite de characteres pour login/mdp
