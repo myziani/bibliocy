@@ -8,4 +8,4 @@ print("saisir votre identifiant");
   scanf(%s,identifiant);
   printf("saisir votre mdp");
   scanf(%s,mdp);
- if
+  FILE*f=fopen("
