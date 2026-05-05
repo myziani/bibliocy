@@ -1,1 +1,5 @@
-*Ici on aura les logins des professeurs*
+ #include<stdio.h>
+#include<string.>
+int main(){
+  char identifiant [100];
+  char mdp [100];
