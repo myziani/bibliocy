@@ -1,1 +1,8 @@
+1 - titre auteur numéro catégorie
 
+
+
+1- Titre
+Auteur
+Numéro
+Catégorie
