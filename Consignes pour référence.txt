@@ -91,3 +91,4 @@ quelqu’un d’autre.
 
 >> Cas où login déjà existant dans les fichier des users
 >>limite de characteres pour login/mdp
+>>sauvegarde et chargement des livres avec structure
