@@ -13,15 +13,15 @@ Livre bibliotheque[MAX_LIVRES];
 int nbLivres = 0;
 
 void enleverRetourLigne(char chaine[]) {
-chaine[strcspn(chaine, "\n")] = '\0';
+        chaine[strcspn(chaine, "\n")] = '\0';
 }
 
 int chargerLivres(Livre livres[]) {
-FILE *fichier = fopen("livres.txt", "r");
+        FILE *fichier = fopen("livres.txt", "r");
 
 if (fichier == NULL) {
-printf("Erreur : impossible d'ouvrir le fichier.\n");
-return 0;
+        printf("Erreur : impossible d'ouvrir le fichier.\n");
+        return 0;
 }
 
 int nb = 0;
