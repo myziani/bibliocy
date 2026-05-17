@@ -15,7 +15,7 @@ typedef struct {
 typedef struct {
     char login[30];
     char mdp[30];
-    char role;        /* 'E' = etudiant, 'P' = professeur (pas encore utilise) */
+    char role;
 } Utilisateur;
 
 Livre       livres[MAX_LIVRES];
@@ -70,6 +70,24 @@ void charger_users() {
     fclose(f);
 }
 
+void sauver_users() {
+    FILE *f = fopen("users.txt", "w");
+    if (f == NULL) return;
+    for (int i = 0; i < nb_users; i++) {
+        fprintf(f, "%s\n", users[i].login);
+        fprintf(f, "%s\n", users[i].mdp);
+        fprintf(f, "%c\n", users[i].role);
+    }
+    fclose(f);
+}
+
+int trouver_user(char login[]) {
+    for (int i = 0; i < nb_users; i++) {
+        if (strcmp(users[i].login, login) == 0) return i;
+    }
+    return -1;
+}
+
 void afficher_livres() {
     printf("=== Liste des livres (%d) ===\n", nb_livres);
     for (int i = 0; i < nb_livres; i++) {
@@ -83,21 +101,44 @@ int connexion() {
     char login[30], mdp[30];
     printf("Login : ");        scanf("%29s", login); vider_buffer();
     printf("Mot de passe : "); scanf("%29s", mdp);   vider_buffer();
-    for (int i = 0; i < nb_users; i++) {
-        if (strcmp(users[i].login, login) == 0 &&
-            strcmp(users[i].mdp,   mdp)   == 0) {
-            printf("Bienvenue %s.\n", login);
-            return i;
-        }
+    int idx = trouver_user(login);
+    if (idx == -1 || strcmp(users[idx].mdp, mdp) != 0) {
+        printf("Login ou mot de passe incorrect.\n");
+        return -1;
     }
-    printf("Login ou mot de passe incorrect.\n");
-    return -1;
+    printf("Bienvenue %s.\n", login);
+    return idx;
+}
+
+void inscription() {
+    if (nb_users >= MAX_USERS) { printf("Trop d'utilisateurs.\n"); return; }
+    char login[30], mdp[30], role_buf[5];
+    printf("Nouveau login : "); scanf("%29s", login); vider_buffer();
+    if (trouver_user(login) != -1) {
+        printf("Ce login existe deja.\n");
+        return;
+    }
+    printf("Mot de passe : ");  scanf("%29s", mdp);      vider_buffer();
+    printf("Role ('E'=etudiant, 'P'=professeur) : ");
+    scanf("%4s", role_buf); vider_buffer();
+    char role = role_buf[0];
+    if (role >= 'a' && role <= 'z') role = role - 'a' + 'A';
+    if (role != 'E' && role != 'P') { printf("Role invalide.\n"); return; }
+
+    strcpy(users[nb_users].login, login);
+    strcpy(users[nb_users].mdp,   mdp);
+    users[nb_users].role = role;
+    nb_users++;
+    sauver_users();
+    printf("Compte cree.\n");
 }
 
 void menu_connecte(int idx) {
     int choix;
     while (1) {
-        printf("\n=== Bonjour %s ===\n", users[idx].login);
+        printf("\n=== Bonjour %s (%s) ===\n",
+               users[idx].login,
+               users[idx].role == 'P' ? "professeur" : "etudiant");
         printf("1. Voir tous les livres\n");
         printf("0. Deconnexion\n");
         printf("Choix : ");
@@ -118,6 +159,7 @@ int main() {
     while (1) {
         printf("\n=========== CY-biblioTECH ===========\n");
         printf("1. Se connecter\n");
+        printf("2. Creer un compte\n");
         printf("0. Quitter\n");
         printf("Choix : ");
         if (scanf("%d", &choix) != 1) { vider_buffer(); continue; }
@@ -128,6 +170,7 @@ int main() {
             int idx = connexion();
             if (idx >= 0) menu_connecte(idx);
         }
+        else if (choix == 2) inscription();
         else printf("Choix invalide.\n");
     }
     return 0;
