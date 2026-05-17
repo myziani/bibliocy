@@ -1,0 +1,28 @@
+1
+Le Petit Prince
+Antoine de Saint-Exupery
+Litterature
+2
+Algorithms
+Robert Sedgewick
+Informatique
+3
+Le C en 21 jours
+Bradley L Jones
+Informatique
+4
+Les Miserables
+Victor Hugo
+Litterature
+5
+Operating System Concepts
+Abraham Silberschatz
+Informatique
+6
+1984
+George Orwell
+Litterature
+7
+Une breve histoire du temps
+Stephen Hawking
+Sciences
