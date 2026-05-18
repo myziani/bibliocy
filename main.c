@@ -1,15 +1,3 @@
-/* ===========================================================
-   CY-biblioTECH - Etape 5
-   -----------------------------------------------------------
-   On ajoute les emprunts :
-     - nouvelle structure Emprunt (id_livre, login)
-     - fichier loans.txt charge/sauve
-     - apres connexion : 1. Emprunter / 2. Rendre / 3. Livres / 0. Decon.
-   Pas encore de duree, pas encore de regles : on peut emprunter
-   autant de livres qu'on veut. On gere juste "deja emprunte par
-   quelqu'un d'autre".
-   =========================================================== */
-
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -17,6 +5,7 @@
 #define MAX_LIVRES   100
 #define MAX_USERS    50
 #define MAX_EMPRUNTS 100
+
 
 typedef struct {
     int  id;
@@ -267,3 +256,6 @@ int main() {
     }
     return 0;
 }
+/* rendre à temps, passer le code en publique, ajouter un makefile, qui marche++, rendre readme, rapport( page garde, nom, bilan d'organisation 
+des tâches, planning, les commentaires (chaque fonction), tabulations, minimum un .c un .h, programme compile, pas de changements dernière minute
+ne crache pas, prof essaie de cracher le code, maîtrise du code (examen oral), sdl, personalisation*/
