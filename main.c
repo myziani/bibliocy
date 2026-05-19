@@ -1,11 +1,12 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <time.h>
 
 #define MAX_LIVRES   100
 #define MAX_USERS    50
 #define MAX_EMPRUNTS 100
-
+#define DUREE_SEC    120    
 
 typedef struct {
     int  id;
@@ -23,6 +24,7 @@ typedef struct {
 typedef struct {
     int  id_livre;
     char login[30];
+    long heure_emprunt;
 } Emprunt;
 
 Livre       livres[MAX_LIVRES];     int nb_livres = 0;
@@ -76,9 +78,8 @@ void charger_users() {
 
 void sauver_users() {
     FILE *f = fopen("users.txt", "w"); if (f == NULL) return;
-    for (int i = 0; i < nb_users; i++) {
+    for (int i = 0; i < nb_users; i++)
         fprintf(f, "%s\n%s\n%c\n", users[i].login, users[i].mdp, users[i].role);
-    }
     fclose(f);
 }
 
@@ -90,6 +91,8 @@ void charger_emprunts() {
         emprunts[nb_emprunts].id_livre = atoi(ligne);
         if (fgets(emprunts[nb_emprunts].login, 30, f) == NULL) break;
         enlever_retour_ligne(emprunts[nb_emprunts].login);
+        if (fgets(ligne, 40, f) == NULL) break;
+        emprunts[nb_emprunts].heure_emprunt = atol(ligne);
         nb_emprunts++;
     }
     fclose(f);
@@ -97,29 +100,16 @@ void charger_emprunts() {
 
 void sauver_emprunts() {
     FILE *f = fopen("loans.txt", "w"); if (f == NULL) return;
-    for (int i = 0; i < nb_emprunts; i++) {
-        fprintf(f, "%d\n%s\n", emprunts[i].id_livre, emprunts[i].login);
-    }
+    for (int i = 0; i < nb_emprunts; i++)
+        fprintf(f, "%d\n%s\n%ld\n",
+                emprunts[i].id_livre, emprunts[i].login,
+                emprunts[i].heure_emprunt);
     fclose(f);
 }
 
-int trouver_user(char login[]) {
-    for (int i = 0; i < nb_users; i++)
-        if (strcmp(users[i].login, login) == 0) return i;
-    return -1;
-}
-
-int trouver_livre(int id) {
-    for (int i = 0; i < nb_livres; i++)
-        if (livres[i].id == id) return i;
-    return -1;
-}
-
-int livre_emprunte(int id) {
-    for (int i = 0; i < nb_emprunts; i++)
-        if (emprunts[i].id_livre == id) return 1;
-    return 0;
-}
+int trouver_user(char login[])  { for (int i=0;i<nb_users;i++) if (strcmp(users[i].login,login)==0) return i; return -1; }
+int trouver_livre(int id)       { for (int i=0;i<nb_livres;i++) if (livres[i].id==id) return i; return -1; }
+int livre_emprunte(int id)      { for (int i=0;i<nb_emprunts;i++) if (emprunts[i].id_livre==id) return 1; return 0; }
 
 void afficher_livres_dispo() {
     printf("=== Livres disponibles ===\n");
@@ -133,15 +123,21 @@ void afficher_livres_dispo() {
 }
 
 void afficher_mes_emprunts(char login[]) {
+    long maintenant = time(NULL);
     printf("Vos emprunts :\n");
     int n = 0;
     for (int i = 0; i < nb_emprunts; i++) {
-        if (strcmp(emprunts[i].login, login) == 0) {
-            int idx = trouver_livre(emprunts[i].id_livre);
-            char *titre = (idx >= 0) ? livres[idx].titre : "(inconnu)";
-            printf("  [#%d] %s\n", emprunts[i].id_livre, titre);
-            n++;
-        }
+        if (strcmp(emprunts[i].login, login) != 0) continue;
+        int idx = trouver_livre(emprunts[i].id_livre);
+        char *titre = (idx >= 0) ? livres[idx].titre : "(inconnu)";
+        long restant = emprunts[i].heure_emprunt + DUREE_SEC - maintenant;
+        if (restant < 0)
+            printf("  [#%d] %-25s  *** EN RETARD de %ld s ***\n",
+                   emprunts[i].id_livre, titre, -restant);
+        else
+            printf("  [#%d] %-25s  a rendre dans %ld s\n",
+                   emprunts[i].id_livre, titre, restant);
+        n++;
     }
     if (n == 0) printf("  (aucun)\n");
 }
@@ -158,6 +154,7 @@ void emprunter(char login[]) {
 
     emprunts[nb_emprunts].id_livre = id;
     strcpy(emprunts[nb_emprunts].login, login);
+    emprunts[nb_emprunts].heure_emprunt = time(NULL);
     nb_emprunts++;
     sauver_emprunts();
     printf("Emprunt OK.\n");
@@ -194,7 +191,7 @@ int connexion() {
 }
 
 void inscription() {
-    if (nb_users >= MAX_USERS) { printf("Trop d'utilisateurs.\n"); return; }
+    if (nb_users >= MAX_USERS) return;
     char login[30], mdp[30], role_buf[5];
     printf("Nouveau login : "); scanf("%29s", login); vider_buffer();
     if (trouver_user(login) != -1) { printf("Login deja pris.\n"); return; }
@@ -218,11 +215,7 @@ void menu_connecte(int idx) {
                users[idx].login,
                users[idx].role == 'P' ? "professeur" : "etudiant");
         afficher_mes_emprunts(users[idx].login);
-        printf("1. Emprunter\n");
-        printf("2. Rendre\n");
-        printf("3. Voir les livres disponibles\n");
-        printf("0. Deconnexion\n");
-        printf("Choix : ");
+        printf("1. Emprunter\n2. Rendre\n3. Voir les livres\n0. Deconnexion\nChoix : ");
         if (scanf("%d", &choix) != 1) { vider_buffer(); continue; }
         vider_buffer();
         if (choix == 0) return;
@@ -243,10 +236,7 @@ int main() {
     int choix;
     while (1) {
         printf("\n=========== CY-biblioTECH ===========\n");
-        printf("1. Se connecter\n");
-        printf("2. Creer un compte\n");
-        printf("0. Quitter\n");
-        printf("Choix : ");
+        printf("1. Se connecter\n2. Creer un compte\n0. Quitter\nChoix : ");
         if (scanf("%d", &choix) != 1) { vider_buffer(); continue; }
         vider_buffer();
         if (choix == 0) break;
@@ -256,6 +246,3 @@ int main() {
     }
     return 0;
 }
-/* rendre à temps, passer le code en publique, ajouter un makefile, qui marche++, rendre readme, rapport( page garde, nom, bilan d'organisation 
-des tâches, planning, les commentaires (chaque fonction), tabulations, minimum un .c un .h, programme compile, pas de changements dernière minute
-ne crache pas, prof essaie de cracher le code, maîtrise du code (examen oral), sdl, personalisation*/
