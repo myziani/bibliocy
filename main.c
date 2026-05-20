@@ -6,7 +6,10 @@
 #define MAX_LIVRES   100
 #define MAX_USERS    50
 #define MAX_EMPRUNTS 100
-#define DUREE_SEC    120    
+#define MAX_ETUDIANT 3
+#define MAX_PROF     5
+#define DUREE_ETU    120
+#define DUREE_PROF   180
 
 typedef struct {
     int  id;
@@ -39,10 +42,7 @@ void enlever_retour_ligne(char s[]) {
     }
 }
 
-void vider_buffer() {
-    int c;
-    while ((c = getchar()) != '\n' && c != EOF) {}
-}
+void vider_buffer() { int c; while ((c = getchar()) != '\n' && c != EOF) {} }
 
 void charger_livres() {
     FILE *f = fopen("books.txt", "r"); if (f == NULL) return;
@@ -111,6 +111,25 @@ int trouver_user(char login[])  { for (int i=0;i<nb_users;i++) if (strcmp(users[
 int trouver_livre(int id)       { for (int i=0;i<nb_livres;i++) if (livres[i].id==id) return i; return -1; }
 int livre_emprunte(int id)      { for (int i=0;i<nb_emprunts;i++) if (emprunts[i].id_livre==id) return 1; return 0; }
 
+int duree_pour(char role) { return (role == 'P') ? DUREE_PROF : DUREE_ETU; }
+
+int compter_emprunts_user(char login[]) {
+    int n = 0;
+    for (int i = 0; i < nb_emprunts; i++)
+        if (strcmp(emprunts[i].login, login) == 0) n++;
+    return n;
+}
+
+int a_des_retards(char login[], char role) {
+    long maintenant = time(NULL);
+    int duree = duree_pour(role);
+    for (int i = 0; i < nb_emprunts; i++) {
+        if (strcmp(emprunts[i].login, login) == 0 &&
+            emprunts[i].heure_emprunt + duree < maintenant) return 1;
+    }
+    return 0;
+}
+
 void afficher_livres_dispo() {
     printf("=== Livres disponibles ===\n");
     for (int i = 0; i < nb_livres; i++) {
@@ -122,15 +141,16 @@ void afficher_livres_dispo() {
     }
 }
 
-void afficher_mes_emprunts(char login[]) {
+void afficher_mes_emprunts(char login[], char role) {
     long maintenant = time(NULL);
+    int duree = duree_pour(role);
     printf("Vos emprunts :\n");
     int n = 0;
     for (int i = 0; i < nb_emprunts; i++) {
         if (strcmp(emprunts[i].login, login) != 0) continue;
         int idx = trouver_livre(emprunts[i].id_livre);
         char *titre = (idx >= 0) ? livres[idx].titre : "(inconnu)";
-        long restant = emprunts[i].heure_emprunt + DUREE_SEC - maintenant;
+        long restant = emprunts[i].heure_emprunt + duree - maintenant;
         if (restant < 0)
             printf("  [#%d] %-25s  *** EN RETARD de %ld s ***\n",
                    emprunts[i].id_livre, titre, -restant);
@@ -142,8 +162,21 @@ void afficher_mes_emprunts(char login[]) {
     if (n == 0) printf("  (aucun)\n");
 }
 
-void emprunter(char login[]) {
+void emprunter(int idx_user) {
+    char *login = users[idx_user].login;
+    char  role  = users[idx_user].role;
+
+    if (a_des_retards(login, role)) {
+        printf("Vous avez des livres en retard, rendez-les d'abord.\n");
+        return;
+    }
+    int max = (role == 'P') ? MAX_PROF : MAX_ETUDIANT;
+    if (compter_emprunts_user(login) >= max) {
+        printf("Limite atteinte (%d livres max pour vous).\n", max);
+        return;
+    }
     if (nb_emprunts >= MAX_EMPRUNTS) { printf("Plein.\n"); return; }
+
     afficher_livres_dispo();
     printf("Id du livre a emprunter : ");
     int id;
@@ -214,12 +247,12 @@ void menu_connecte(int idx) {
         printf("\n=== Bonjour %s (%s) ===\n",
                users[idx].login,
                users[idx].role == 'P' ? "professeur" : "etudiant");
-        afficher_mes_emprunts(users[idx].login);
+        afficher_mes_emprunts(users[idx].login, users[idx].role);
         printf("1. Emprunter\n2. Rendre\n3. Voir les livres\n0. Deconnexion\nChoix : ");
         if (scanf("%d", &choix) != 1) { vider_buffer(); continue; }
         vider_buffer();
         if (choix == 0) return;
-        else if (choix == 1) emprunter(users[idx].login);
+        else if (choix == 1) emprunter(idx);
         else if (choix == 2) rendre(users[idx].login);
         else if (choix == 3) afficher_livres_dispo();
         else printf("Choix invalide.\n");
@@ -246,4 +279,3 @@ int main() {
     }
     return 0;
 }
-
