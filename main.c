@@ -3,7 +3,7 @@
 #include "utilisateur.h"
 #include "emprunt.h"
 
-/* Les autres .c ont juste besoin de connaitre les prototypes. */
+
 void enlever_retour_ligne(char chaine[]);
 void vider_buffer();
 
