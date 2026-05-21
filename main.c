@@ -61,6 +61,16 @@ void charger_livres() {
     fclose(f);
 }
 
+void sauver_livres() {
+    FILE *f = fopen("books.txt", "w"); if (f == NULL) return;
+    for (int i = 0; i < nb_livres; i++) {
+        fprintf(f, "%d\n%s\n%s\n%s\n",
+                livres[i].id, livres[i].titre,
+                livres[i].auteur, livres[i].categorie);
+    }
+    fclose(f);
+}
+
 void charger_users() {
     FILE *f = fopen("users.txt", "r"); if (f == NULL) return;
     char ligne[40];
@@ -110,8 +120,7 @@ void sauver_emprunts() {
 int trouver_user(char login[])  { for (int i=0;i<nb_users;i++) if (strcmp(users[i].login,login)==0) return i; return -1; }
 int trouver_livre(int id)       { for (int i=0;i<nb_livres;i++) if (livres[i].id==id) return i; return -1; }
 int livre_emprunte(int id)      { for (int i=0;i<nb_emprunts;i++) if (emprunts[i].id_livre==id) return 1; return 0; }
-
-int duree_pour(char role) { return (role == 'P') ? DUREE_PROF : DUREE_ETU; }
+int duree_pour(char role)       { return (role == 'P') ? DUREE_PROF : DUREE_ETU; }
 
 int compter_emprunts_user(char login[]) {
     int n = 0;
@@ -130,15 +139,26 @@ int a_des_retards(char login[], char role) {
     return 0;
 }
 
-void afficher_livres_dispo() {
-    printf("=== Livres disponibles ===\n");
-    for (int i = 0; i < nb_livres; i++) {
-        if (!livre_emprunte(livres[i].id)) {
-            printf("  [#%d] %s - %s (%s)\n",
-                   livres[i].id, livres[i].titre,
-                   livres[i].auteur, livres[i].categorie);
+/* mode = 't' titre, 'a' auteur, 'c' categorie */
+void trier_livres(char mode) {
+    for (int i = 0; i < nb_livres - 1; i++) {
+        for (int j = 0; j < nb_livres - 1 - i; j++) {
+            char *a, *b;
+            if (mode == 'a')      { a = livres[j].auteur;    b = livres[j+1].auteur;    }
+            else if (mode == 'c') { a = livres[j].categorie; b = livres[j+1].categorie; }
+            else                  { a = livres[j].titre;     b = livres[j+1].titre;     }
+            if (strcmp(a, b) > 0) {
+                Livre tmp = livres[j];
+                livres[j]   = livres[j+1];
+                livres[j+1] = tmp;
+            }
         }
     }
+}
+
+void afficher_livre(int i) {
+    printf("  [#%d] %-25s | %-20s | %s\n",
+           livres[i].id, livres[i].titre, livres[i].auteur, livres[i].categorie);
 }
 
 void afficher_mes_emprunts(char login[], char role) {
@@ -167,21 +187,45 @@ void emprunter(int idx_user) {
     char  role  = users[idx_user].role;
 
     if (a_des_retards(login, role)) {
-        printf("Vous avez des livres en retard, rendez-les d'abord.\n");
-        return;
+        printf("Vous avez des livres en retard, rendez-les d'abord.\n"); return;
     }
     int max = (role == 'P') ? MAX_PROF : MAX_ETUDIANT;
     if (compter_emprunts_user(login) >= max) {
-        printf("Limite atteinte (%d livres max pour vous).\n", max);
-        return;
+        printf("Limite atteinte (%d livres).\n", max); return;
     }
     if (nb_emprunts >= MAX_EMPRUNTS) { printf("Plein.\n"); return; }
 
-    afficher_livres_dispo();
-    printf("Id du livre a emprunter : ");
+    printf("\n1. Trier par titre\n2. Trier par auteur\n3. Filtrer par categorie\nChoix : ");
+    int choix;
+    if (scanf("%d", &choix) != 1) { vider_buffer(); printf("Invalide.\n"); return; }
+    vider_buffer();
+
+    char filtre_cat[40] = "";
+    if (choix == 1)      trier_livres('t');
+    else if (choix == 2) trier_livres('a');
+    else if (choix == 3) {
+        printf("Categorie : ");
+        fgets(filtre_cat, 40, stdin);
+        enlever_retour_ligne(filtre_cat);
+        trier_livres('c');
+    } else { printf("Choix invalide.\n"); return; }
+    sauver_livres();
+
+    printf("\nLivres disponibles :\n");
+    int vu = 0;
+    for (int i = 0; i < nb_livres; i++) {
+        if (livre_emprunte(livres[i].id)) continue;
+        if (choix == 3 && strcmp(livres[i].categorie, filtre_cat) != 0) continue;
+        afficher_livre(i);
+        vu++;
+    }
+    if (vu == 0) { printf("  (aucun)\n"); return; }
+
+    printf("\nId du livre (0 pour annuler) : ");
     int id;
     if (scanf("%d", &id) != 1) { vider_buffer(); printf("Invalide.\n"); return; }
     vider_buffer();
+    if (id == 0) return;
     if (trouver_livre(id) == -1) { printf("Inexistant.\n"); return; }
     if (livre_emprunte(id))      { printf("Deja emprunte.\n"); return; }
 
@@ -209,6 +253,25 @@ void rendre(char login[]) {
     nb_emprunts--;
     sauver_emprunts();
     printf("Livre rendu.\n");
+}
+
+void ajouter_livre() {
+    if (nb_livres >= MAX_LIVRES) { printf("Bibliotheque pleine.\n"); return; }
+    int nouveau_id = 1;
+    for (int i = 0; i < nb_livres; i++)
+        if (livres[i].id >= nouveau_id) nouveau_id = livres[i].id + 1;
+
+    printf("Titre     : "); fgets(livres[nb_livres].titre, 80, stdin);
+    enlever_retour_ligne(livres[nb_livres].titre);
+    printf("Auteur    : "); fgets(livres[nb_livres].auteur, 80, stdin);
+    enlever_retour_ligne(livres[nb_livres].auteur);
+    printf("Categorie : "); fgets(livres[nb_livres].categorie, 40, stdin);
+    enlever_retour_ligne(livres[nb_livres].categorie);
+
+    livres[nb_livres].id = nouveau_id;
+    nb_livres++;
+    sauver_livres();
+    printf("Livre ajoute (id %d).\n", nouveau_id);
 }
 
 int connexion() {
@@ -248,13 +311,15 @@ void menu_connecte(int idx) {
                users[idx].login,
                users[idx].role == 'P' ? "professeur" : "etudiant");
         afficher_mes_emprunts(users[idx].login, users[idx].role);
-        printf("1. Emprunter\n2. Rendre\n3. Voir les livres\n0. Deconnexion\nChoix : ");
+        printf("1. Emprunter\n2. Rendre\n");
+        if (users[idx].role == 'P') printf("3. Ajouter un livre\n");
+        printf("0. Deconnexion\nChoix : ");
         if (scanf("%d", &choix) != 1) { vider_buffer(); continue; }
         vider_buffer();
         if (choix == 0) return;
         else if (choix == 1) emprunter(idx);
         else if (choix == 2) rendre(users[idx].login);
-        else if (choix == 3) afficher_livres_dispo();
+        else if (choix == 3 && users[idx].role == 'P') ajouter_livre();
         else printf("Choix invalide.\n");
     }
 }
