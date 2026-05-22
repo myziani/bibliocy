@@ -1,120 +1,184 @@
+# CY-biblioTECH - Liste des livres
+# 4 lignes par livre : id, titre, auteur, categorie
+# Les lignes vides et les lignes commencant par # sont ignorees.
+
+# --- Livre #1 ---
 1
 Le Petit Prince
 Antoine de Saint-Exupery
 Litterature
+
+# --- Livre #2 ---
 2
 Algorithms
 Robert Sedgewick
 Informatique
+
+# --- Livre #3 ---
 3
 Le C en 21 jours
 Bradley L Jones
 Informatique
+
+# --- Livre #4 ---
 4
 Les Miserables
 Victor Hugo
 Litterature
+
+# --- Livre #5 ---
 5
 Operating System Concepts
 Abraham Silberschatz
 Informatique
+
+# --- Livre #6 ---
 6
 1984
 George Orwell
 Litterature
+
+# --- Livre #7 ---
 7
 Une breve histoire du temps
 Stephen Hawking
 Sciences
+
+# --- Livre #8 ---
 8
 Alchemised
 SenLinYu
 Fantaisie
+
+# --- Livre #9 ---
 9
 Les Grandes Oubliées - Pourquoi l'Histoire a effacé les femmes
 Titiou Lecoq
 Litterature
+
+# --- Livre #10 ---
 10
 Harry Potter à l’école des sorciers
 J.K. Rowling
 Fantaisie
+
+# --- Livre #11 ---
 11
 L’Étranger
 Albert Camus
 Littérature
+
+# --- Livre #12 ---
 12
 Clean Code
 Robert C. Martin
 Informatique
+
+# --- Livre #13 ---
 13
 Le Seigneur des Anneaux
 J.R.R. Tolkien
 Fantaisie
+
+# --- Livre #14 ---
 14
 Le Comte de Monte-Cristo
 Alexandre Dumas
 Littérature
+
+# --- Livre #15 ---
 15
 Introduction to Algorithms
 Thomas H. Cormen
 Informatique
+
+# --- Livre #16 ---
 16
 Orgueil et Préjugés
 Jane Austen
 Romance
+
+# --- Livre #17 ---
 17
 Dune
 Frank Herbert
 Science-fiction
+
+# --- Livre #18 ---
 18
 Percy Jackson : Le voleur de foudre
 Rick Riordan
 Fantaisie
+
+# --- Livre #19 ---
 19
 Frankenstein
 Mary Shelley
 Horreur
+
+# --- Livre #20 ---
 20
 L’Attaque des Titans
 Hajime Isayama
 Manga / Fantaisie
+
+# --- Livre #21 ---
 21
 Jujutsu Kaisen
 Gege Akutami
 Manga / Action
+
+# --- Livre #22 ---
 22
 Nana
 Ai Yazawa
 Manga / Romance
+
+# --- Livre #23 ---
 23
 Vinland Saga
 Makoto Yukimura
 Manga / Historique
+
+# --- Livre #24 ---
 24
 The Hunger Games
 Suzanne Collins
 Science-fiction
+
+# --- Livre #25 ---
 25
 Le Hobbit
 J.R.R. Tolkien
 Fantaisie
+
+# --- Livre #26 ---
 26
 Da Vinci Code
 Dan Brown
 Thriller
+
+# --- Livre #27 ---
 27
 Le Journal d’Anne Frank
 Anne Frank
 Biographie
+
+# --- Livre #28 ---
 28
 Twilight
 Stephenie Meyer
 Romance / Fantaisie
+
+# --- Livre #29 ---
 29
 Sherlock Holmes : Une étude en rouge
 Arthur Conan Doyle
 Policier
+
+# --- Livre #30 ---
 30
 The Maze Runner
 James Dashner
 Science-fiction
+

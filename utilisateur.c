@@ -4,8 +4,8 @@
 #include "utilisateur.h"
 
 /* Fonctions utiles definies dans main.c */
-void enlever_retour_ligne(char chaine[]);
 void vider_buffer();
+int  lire_ligne_utile(FILE *f, char buf[], int taille);
 
 Utilisateur users[MAX_USERS];
 int         nb_users = 0;
@@ -13,13 +13,13 @@ int         nb_users = 0;
 void charger_users() {
     FILE *f = fopen("users.txt", "r");
     if (f == NULL) return;
+
+    nb_users = 0;
     char ligne[40];
     while (nb_users < MAX_USERS) {
-        if (fgets(users[nb_users].login, 30, f) == NULL) break;
-        if (fgets(users[nb_users].mdp,   30, f) == NULL) break;
-        if (fgets(ligne, 40, f) == NULL) break;
-        enlever_retour_ligne(users[nb_users].login);
-        enlever_retour_ligne(users[nb_users].mdp);
+        if (!lire_ligne_utile(f, users[nb_users].login, 30)) break;
+        if (!lire_ligne_utile(f, users[nb_users].mdp,   30)) break;
+        if (!lire_ligne_utile(f, ligne, 40)) break;
         users[nb_users].role = ligne[0];
         nb_users++;
     }
@@ -29,27 +29,59 @@ void charger_users() {
 void sauver_users() {
     FILE *f = fopen("users.txt", "w");
     if (f == NULL) return;
-    for (int i = 0; i < nb_users; i++)
-        fprintf(f, "%s\n%s\n%c\n", users[i].login, users[i].mdp, users[i].role);
+    fprintf(f, "# CY-biblioTECH - Liste des utilisateurs\n");
+    fprintf(f, "# 3 lignes par utilisateur : login, mot de passe, role\n");
+    fprintf(f, "# Role : E = etudiant, P = professeur\n");
+    fprintf(f, "\n");
+    for (int i = 0; i < nb_users; i++) {
+        fprintf(f, "# --- %s ---\n", users[i].login);
+        fprintf(f, "%s\n", users[i].login);
+        fprintf(f, "%s\n", users[i].mdp);
+        fprintf(f, "%c\n", users[i].role);
+        fprintf(f, "\n");
+    }
     fclose(f);
 }
 
 int trouver_user(char login[]) {
-    for (int i = 0; i < nb_users; i++)
+    for (int i = 0; i < nb_users; i++) {
         if (strcmp(users[i].login, login) == 0) return i;
+    }
     return -1;
 }
 
 void inscription() {
-    if (nb_users >= MAX_USERS) return;
+    if (nb_users >= MAX_USERS) {
+        printf("Trop d'utilisateurs deja enregistres.\n");
+        return;
+    }
+
     char login[30], mdp[30], role_buf[5];
-    printf("Nouveau login : "); scanf("%29s", login); vider_buffer();
-    if (trouver_user(login) != -1) { printf("Login deja pris.\n"); return; }
-    printf("Mot de passe : "); scanf("%29s", mdp); vider_buffer();
-    printf("Role ('E'/'P') : "); scanf("%4s", role_buf); vider_buffer();
+
+    printf("Nouveau login : ");
+    scanf("%29s", login);
+    vider_buffer();
+
+    if (trouver_user(login) != -1) {
+        printf("Ce login existe deja.\n");
+        return;
+    }
+
+    printf("Mot de passe : ");
+    scanf("%29s", mdp);
+    vider_buffer();
+
+    printf("Role ('E'=etudiant, 'P'=professeur) : ");
+    scanf("%4s", role_buf);
+    vider_buffer();
+
     char role = role_buf[0];
     if (role >= 'a' && role <= 'z') role = role - 'a' + 'A';
-    if (role != 'E' && role != 'P') { printf("Role invalide.\n"); return; }
+    if (role != 'E' && role != 'P') {
+        printf("Role invalide.\n");
+        return;
+    }
+
     strcpy(users[nb_users].login, login);
     strcpy(users[nb_users].mdp,   mdp);
     users[nb_users].role = role;
@@ -60,12 +92,20 @@ void inscription() {
 
 int connexion() {
     char login[30], mdp[30];
-    printf("Login : "); scanf("%29s", login); vider_buffer();
-    printf("Mot de passe : "); scanf("%29s", mdp); vider_buffer();
+
+    printf("Login : ");
+    scanf("%29s", login);
+    vider_buffer();
+
+    printf("Mot de passe : ");
+    scanf("%29s", mdp);
+    vider_buffer();
+
     int idx = trouver_user(login);
     if (idx == -1 || strcmp(users[idx].mdp, mdp) != 0) {
-        printf("Login ou mot de passe incorrect.\n"); return -1;
+        printf("Login ou mot de passe incorrect.\n");
+        return -1;
     }
-    printf("Bienvenue %s.\n", login);
+    printf("Connecte en tant que %s.\n", login);
     return idx;
 }

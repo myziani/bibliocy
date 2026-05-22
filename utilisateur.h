@@ -1,4 +1,5 @@
-/* utilisateur.h - Module qui gere les comptes (etudiants / professeurs). */
+/* utilisateur.h
+   Module qui gere les comptes (etudiants 'E' et professeurs 'P'). */
 #ifndef UTILISATEUR_H
 #define UTILISATEUR_H
 
@@ -15,8 +16,8 @@ extern int         nb_users;
 
 void charger_users();
 void sauver_users();
-int  trouver_user(char login[]);
+int  trouver_user(char login[]);     /* renvoie l'indice ou -1 */
 void inscription();
-int  connexion();
+int  connexion();                    /* renvoie l'indice du user, ou -1 */
 
 #endif

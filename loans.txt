@@ -1,0 +1,8 @@
+# CY-biblioTECH - Emprunts en cours
+# 3 lignes par emprunt : id du livre, login, heure d'emprunt (timestamp Unix)
+
+# --- alice a emprunte le livre #5 ---
+5
+alice
+1778715309
+

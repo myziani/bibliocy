@@ -1,6 +1,19 @@
+# CY-biblioTECH - Liste des utilisateurs
+# 3 lignes par utilisateur : login, mot de passe, role
+# Role : E = etudiant, P = professeur
+
+# --- admin ---
 admin
 admin
 P
+
+# --- alice ---
 alice
 1234
 E
+
+# --- choco ---
+choco
+chocolat
+P
+
