@@ -59,12 +59,12 @@ void inscription() {
 
     char login[30], mdp[30], role_buf[5];
 
-    printf("Nouveau login : ");
+    printf("Nouvel identifiant : ");
     scanf("%29s", login);
     vider_buffer();
 
     if (trouver_user(login) != -1) {
-        printf("Ce login existe deja.\n");
+        printf("Cet identifiant existe deja.\n");
         return;
     }
 
@@ -105,7 +105,7 @@ void inscription() {
 int connexion() {
     char login[30], mdp[30];
 
-    printf("Login : ");
+    printf("identifiant : ");
     scanf("%29s", login);
     vider_buffer();
 
@@ -114,7 +114,7 @@ int connexion() {
 
     int idx = trouver_user(login);
     if (idx == -1 || strcmp(users[idx].mdp, mdp) != 0) {
-        printf("Login ou mot de passe incorrect.\n");
+        printf("identifiant ou mot de passe incorrect.\n");
         return -1;
     }
     printf("Connecte en tant que %s.\n", login);
