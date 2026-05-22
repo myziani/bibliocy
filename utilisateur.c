@@ -82,6 +82,19 @@ void inscription() {
         return;
     }
 
+    /* Pour un compte professeur on demande le mot de passe maitre.
+       Ca evite que n'importe quel etudiant se cree un compte prof. */
+    if (role == 'P') {
+        char mdp_master[30];
+        printf("Mot de passe professeur : ");
+        scanf("%29s", mdp_master);
+        vider_buffer();
+        if (strcmp(mdp_master, MDP_PROF_MASTER) != 0) {
+            printf("Mot de passe professeur incorrect. Compte non cree.\n");
+            return;
+        }
+    }
+
     strcpy(users[nb_users].login, login);
     strcpy(users[nb_users].mdp,   mdp);
     users[nb_users].role = role;

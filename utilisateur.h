@@ -5,6 +5,10 @@
 
 #define MAX_USERS 50
 
+/* Mot de passe "maitre" demande quand quelqu'un veut creer un compte
+   professeur. Empeche les etudiants de s'auto-promouvoir en prof. */
+#define MDP_PROF_MASTER "biblio2026"
+
 typedef struct {
     char login[30];
     char mdp[30];
