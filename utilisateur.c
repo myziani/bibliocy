@@ -6,6 +6,7 @@
 /* Fonctions utiles definies dans main.c */
 void vider_buffer();
 int  lire_ligne_utile(FILE *f, char buf[], int taille);
+void lire_mdp(char buf[], int taille);
 
 Utilisateur users[MAX_USERS];
 int         nb_users = 0;
@@ -68,8 +69,7 @@ void inscription() {
     }
 
     printf("Mot de passe : ");
-    scanf("%29s", mdp);
-    vider_buffer();
+    lire_mdp(mdp, 30);
 
     printf("Role ('E'=etudiant, 'P'=professeur) : ");
     scanf("%4s", role_buf);
@@ -87,8 +87,7 @@ void inscription() {
     if (role == 'P') {
         char mdp_master[30];
         printf("Mot de passe professeur : ");
-        scanf("%29s", mdp_master);
-        vider_buffer();
+        lire_mdp(mdp_master, 30);
         if (strcmp(mdp_master, MDP_PROF_MASTER) != 0) {
             printf("Mot de passe professeur incorrect. Compte non cree.\n");
             return;
@@ -111,8 +110,7 @@ int connexion() {
     vider_buffer();
 
     printf("Mot de passe : ");
-    scanf("%29s", mdp);
-    vider_buffer();
+    lire_mdp(mdp, 30);
 
     int idx = trouver_user(login);
     if (idx == -1 || strcmp(users[idx].mdp, mdp) != 0) {

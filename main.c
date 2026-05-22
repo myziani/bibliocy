@@ -1,4 +1,17 @@
+/* ===========================================================
+   CY-biblioTECH - Projet C preING1
+   ===========================================================
+   Programme qui gere une bibliotheque universitaire.
+   Le code est decoupe en 4 modules :
+     - utils       : petites fonctions partagees
+     - livre       : les livres
+     - utilisateur : les comptes (etudiants / profs)
+     - emprunt     : les emprunts et les regles
+   Ce fichier ne contient que le main() et les menus.
+   =========================================================== */
+
 #include <stdio.h>
+#include <termios.h>      /* pour cacher les mots de passe a la saisie */
 #include "livre.h"
 #include "utilisateur.h"
 #include "emprunt.h"
@@ -8,6 +21,7 @@
 void enlever_retour_ligne(char chaine[]);
 void vider_buffer();
 int  lire_ligne_utile(FILE *f, char buf[], int taille);
+void lire_mdp(char buf[], int taille);
 
 void menu_connecte(int idx_user) {
     while (1) {
@@ -78,6 +92,13 @@ int main() {
     return 0;
 }
 
+
+/* ===========================================================
+   PETITES FONCTIONS UTILES
+   Definies ici pour eviter d'avoir un fichier separe.
+   Les autres modules les declarent en haut de leur fichier .c.
+   =========================================================== */
+
 /* Enleve le \n a la fin d'une chaine lue avec fgets. */
 void enlever_retour_ligne(char chaine[]) {
     int i = 0;
@@ -96,6 +117,67 @@ void vider_buffer() {
     while ((c = getchar()) != '\n' && c != EOF) {
         /* on jette les caracteres */
     }
+}
+
+/* Lit un mot de passe avec un affichage "telephone" :
+     - la lettre qu'on vient de taper reste visible une fraction de seconde
+       (en fait : jusqu'a la prochaine touche)
+     - des qu'on tape la suivante, l'ancienne devient '*'
+     - quand on appuie sur Entree, la derniere visible devient aussi '*'
+   Gere la touche Suppr/Backspace pour corriger une faute de frappe.
+   Si stdin n'est pas un terminal (ex : entree pipee), on lit sans masquage. */
+void lire_mdp(char buf[], int taille) {
+    struct termios old, new;
+    int has_term = (tcgetattr(0, &old) == 0);
+
+    if (has_term) {
+        new = old;
+        new.c_lflag &= ~(ECHO | ICANON);   /* pas d'echo automatique, pas de buffering ligne */
+        tcsetattr(0, TCSANOW, &new);
+    }
+
+    int i = 0;
+    int c;
+    while (i < taille - 1) {
+        c = getchar();
+
+        /* Entree : on termine. On masque aussi la derniere lettre encore visible. */
+        if (c == '\n' || c == '\r' || c == EOF) {
+            if (has_term && i > 0) { printf("\b*"); fflush(stdout); }
+            break;
+        }
+
+        /* Backspace (Suppr arriere) */
+        if (c == 127 || c == 8) {
+            if (i > 0 && has_term) {
+                if (i == 1) {
+                    /* Une seule lettre visible : on l'efface. */
+                    printf("\b \b");
+                } else {
+                    /* On efface la derniere et on re-affiche l'avant-derniere
+                       en clair (puisqu'elle devient la nouvelle "derniere"). */
+                    printf("\b \b\b%c", buf[i-2]);
+                }
+                fflush(stdout);
+            }
+            if (i > 0) i--;
+            continue;
+        }
+
+        /* Nouvelle lettre : si une lettre etait visible avant, on la masque
+           en revenant en arriere et en ecrivant '*' a sa place, puis on
+           affiche la nouvelle en clair. */
+        if (has_term) {
+            if (i > 0) printf("\b*");
+            printf("%c", c);
+            fflush(stdout);
+        }
+        buf[i++] = (char)c;
+    }
+    buf[i] = '\0';
+
+    if (has_term) tcsetattr(0, TCSANOW, &old);
+    printf("\n");
 }
 
 /* Lit la prochaine ligne utile d'un fichier en sautant les lignes
