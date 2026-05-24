@@ -12,8 +12,5 @@ alice
 1234
 E
 
-# --- choco ---
-choco
-chocolat
-P
+
 
