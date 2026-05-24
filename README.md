@@ -17,7 +17,7 @@ Toutes les données sont sauvegardées dans des fichiers texte lisibles et recha
 **Comptes utilisateurs**
 - Création de compte avec login, mot de passe et rôle (étudiant ou professeur)
 - Connexion sécurisée
-- Deux rôles : `E` = étudiant, `P` = professeur
+- Deux rôles : `E` = étudiant, `P` = professeur (mdp professeur: biblio2026)
 
 **Catalogue de livres**
 - Affichage trié par titre, par auteur ou filtré par catégorie
@@ -91,7 +91,7 @@ timestamp_unix
 
 ## Compilation et lancement
 
-**Sous Linux / WSL :**
+**Sous Linux :**
 ```bash
 gcc -Wall -std=c99 -O2 main.c livre.c utilisateur.c emprunt.c -o bibliotech
 ./bibliotech
@@ -110,7 +110,6 @@ bash test.sh
 |---|---|---|
 | admin | admin | Professeur |
 | alice | 1234 | Étudiante |
-| choco | chocolat | Professeur |
 
 ---
 
